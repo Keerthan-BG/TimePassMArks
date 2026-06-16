@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Industrial Digital Twin Dashboard</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+<header>
+    <h1>Industrial Digital Twin Dashboard</h1>
+</header>
+
+<div class="dashboard">
+
+    <!-- LEFT PANEL -->
+
+    <div class="panel">
+
+        <div class="card">
+
+            <h2>Machine Health</h2>
+
+            {% if attack %}
+                <div class="health critical">20%</div>
+
+            {% elif anomaly %}
+                <div class="health warning">55%</div>
+
+            {% else %}
+                <div class="health healthy">95%</div>
+            {% endif %}
+
+        </div>
+
+        <div class="card">
+
+            <h2>System Status</h2>
+
+            {% if attack %}
+                <p class="critical-text">
+                    SENSOR MANIPULATION DETECTED
+                </p>
+
+            {% elif anomaly %}
+                <p class="warning-text">
+                    MACHINE ANOMALY DETECTED
+                </p>
+
+            {% else %}
+                <p class="healthy-text">
+                    NORMAL OPERATION
+                </p>
+            {% endif %}
+
+        </div>
+
+    </div>
+
+    <!-- CENTER PANEL -->
+
+    <div class="panel center">
+
+        <div class="digital-twin">
+
+            <h2>Digital Twin</h2>
+
+            <div class="sensor">
+                🌡️ Temperature :
+                {{ data.temperature }} °C
+            </div>
+
+            <div class="machine">
+
+                <div class="machine-header"></div>
+
+                <div class="machine-body">
+                    INDUSTRIAL MOTOR
+                </div>
+
+                <div class="machine-base"></div>
+
+            </div>
+
+            <div class="sensor">
+                📳 Vibration :
+                {{ data.vibration }}
+            </div>
+
+            <div class="sensor">
+                ⚡ Current :
+                {{ data.current }} A
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- RIGHT PANEL -->
+
+    <div class="panel">
+
+        <div class="card">
+
+            <h2>Sensor Readings</h2>
+
+            <div class="reading">
+                Temperature
+                <span>{{ data.temperature }} °C</span>
+            </div>
+
+            <div class="reading">
+                Vibration
+                <span>{{ data.vibration }}</span>
+            </div>
+
+            <div class="reading">
+                Current
+                <span>{{ data.current }} A</span>
+            </div>
+
+        </div>
+
+        <div class="card">
+
+            <h2>Integrity Verification</h2>
+
+            {% if attack %}
+                <p class="critical-text">
+                    Integrity Violation Found
+                </p>
+
+                <hr>
+
+                <p>
+                    Actual machine behavior suggests
+                    overheating while the temperature
+                    sensor appears normal.
+                </p>
+
+            {% else %}
+                <p class="healthy-text">
+                    Sensor Integrity Verified
+                </p>
+            {% endif %}
+
+        </div>
+
+    </div>
+
+</div>
+
+<div class="controls">
+
+    <a href="/normal">
+        <button>Normal Mode</button>
+    </a>
+
+    <a href="/fault">
+        <button>Machine Fault</button>
+    </a>
+
+    <a href="/attack">
+        <button>Hacker Attack</button>
+    </a>
+
+</div>
+
+<footer>
+
+    {% if attack %}
+        <p class="critical-text">
+            ALERT : Possible Sensor Manipulation Attack
+        </p>
+
+    {% elif anomaly %}
+        <p class="warning-text">
+            ALERT : Machine Fault Detected
+        </p>
+
+    {% else %}
+        <p class="healthy-text">
+            No Active Alerts
+        </p>
+    {% endif %}
+
+</footer>
+
+</body>
+</html>

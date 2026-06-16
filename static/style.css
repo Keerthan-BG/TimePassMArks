@@ -1,0 +1,175 @@
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    font-family:Arial, sans-serif;
+    background:#0f172a;
+    color:white;
+}
+
+header{
+    text-align:center;
+    padding:25px;
+    background:#1e293b;
+    box-shadow:0 2px 10px black;
+}
+
+.dashboard{
+    display:flex;
+    justify-content:space-around;
+    padding:30px;
+}
+
+.panel{
+    width:28%;
+}
+
+.center{
+    width:40%;
+}
+
+.card{
+    background:#1e293b;
+    padding:20px;
+    margin-bottom:20px;
+    border-radius:12px;
+    box-shadow:0 0 10px rgba(0,0,0,.3);
+}
+
+.card h2{
+    margin-bottom:15px;
+}
+
+.health{
+    font-size:50px;
+    font-weight:bold;
+    text-align:center;
+}
+
+.healthy{
+    color:#22c55e;
+}
+
+.warning{
+    color:#f59e0b;
+}
+
+.critical{
+    color:#ef4444;
+}
+
+.healthy-text{
+    color:#22c55e;
+    font-weight:bold;
+}
+
+.warning-text{
+    color:#f59e0b;
+    font-weight:bold;
+}
+
+.critical-text{
+    color:#ef4444;
+    font-weight:bold;
+}
+
+.digital-twin{
+    background:#1e293b;
+    border-radius:15px;
+    padding:30px;
+    text-align:center;
+    position:relative;
+}
+
+.digital-twin h2{
+    margin-bottom:25px;
+}
+
+.machine{
+    margin-top:40px;
+}
+
+.machine-header{
+    width:120px;
+    height:40px;
+    background:#64748b;
+    margin:auto;
+    border-radius:10px 10px 0 0;
+}
+
+.machine-body{
+    width:320px;
+    height:180px;
+    background:#475569;
+    margin:auto;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:24px;
+    font-weight:bold;
+    border-radius:15px;
+}
+
+.machine-base{
+    width:360px;
+    height:25px;
+    background:#334155;
+    margin:auto;
+    border-radius:0 0 10px 10px;
+}
+
+.sensor{
+    background:#2563eb;
+    width:180px;
+    padding:10px;
+    border-radius:10px;
+    margin:auto;
+    font-weight:bold;
+}
+
+.top{
+    margin-bottom:20px;
+}
+
+.left{
+    margin-top:20px;
+}
+
+.right{
+    margin-top:20px;
+}
+
+.reading{
+    display:flex;
+    justify-content:space-between;
+    padding:10px 0;
+    border-bottom:1px solid #334155;
+}
+
+.controls{
+    text-align:center;
+    margin:20px;
+}
+
+button{
+    padding:14px 35px;
+    border:none;
+    border-radius:10px;
+    background:#2563eb;
+    color:white;
+    font-size:16px;
+    cursor:pointer;
+}
+
+button:hover{
+    background:#1d4ed8;
+}
+
+footer{
+    text-align:center;
+    padding:20px;
+    background:#1e293b;
+}
