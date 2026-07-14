@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>M-4471 // Induction Motor Digital Twin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="app">
+
+  <header class="topbar">
+    <div class="topbar-id">
+      <span class="tag">ASSET</span>
+      <h1>M-4471 <span class="dim">/ 7.5kW induction motor &mdash; pump drive</span></h1>
+    </div>
+    <div class="topbar-status">
+      <div class="status-chip" id="connChip"><span class="dot"></span><span id="connLabel">CONNECTING</span></div>
+      <div class="status-chip" id="tripChip"><span class="dot"></span><span>RUNNING</span></div>
+      <button class="btn btn-ghost" id="resetBtn">RESET SIM</button>
+    </div>
+  </header>
+
+  <main class="grid">
+
+    <!-- Telemetry stat row -->
+    <section class="panel stats-row">
+      <div class="stat">
+        <div class="stat-label">Applied Freq</div>
+        <div class="stat-value" id="statFreq">0.0<span class="unit">Hz</span></div>
+        <div class="stat-bar"><div class="stat-bar-fill" id="barFreq" style="width:0%"></div></div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Rotor Speed</div>
+        <div class="stat-value" id="statRpm">0<span class="unit">RPM</span></div>
+        <div class="stat-bar"><div class="stat-bar-fill" id="barRpm" style="width:0%"></div></div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Slip</div>
+        <div class="stat-value" id="statSlip">0.0<span class="unit">%</span></div>
+        <div class="stat-bar"><div class="stat-bar-fill" id="barSlip" style="width:0%"></div></div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Stator Current</div>
+        <div class="stat-value" id="statCurrent">0.0<span class="unit">A</span></div>
+        <div class="stat-bar"><div class="stat-bar-fill" id="barCurrent" style="width:0%"></div></div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Winding Temp</div>
+        <div class="stat-value" id="statTemp">25<span class="unit">&deg;C</span></div>
+        <div class="stat-bar"><div class="stat-bar-fill" id="barTemp" style="width:0%"></div></div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">EM Torque</div>
+        <div class="stat-value" id="statTorque">0.0<span class="unit">N&middot;m</span></div>
+        <div class="stat-bar"><div class="stat-bar-fill" id="barTorque" style="width:0%"></div></div>
+      </div>
+    </section>
+
+    <!-- Physical motor cutaway -- driven live by simulation state, not a canned loop -->
+    <section class="panel motor-visual">
+      <div class="panel-head">
+        <span class="eyebrow">MOTOR M-4471 &mdash; CUTAWAY VIEW</span>
+        <span class="dim-sm">rotation, heat glow and current flow are read directly from the physics engine</span>
+      </div>
+      <svg id="motorSvg" viewBox="0 0 640 240" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <radialGradient id="heatGlow" cx="50%" cy="50%" r="60%">
+            <stop offset="0%" stop-color="#ffb020" stop-opacity="0.55"/>
+            <stop offset="100%" stop-color="#ffb020" stop-opacity="0"/>
+          </radialGradient>
+          <linearGradient id="bodyGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#2a3542"/>
+            <stop offset="100%" stop-color="#161d24"/>
+          </linearGradient>
+          <path id="fanBlade" d="M 520,120 Q 507,96 520,68 Q 533,96 520,120 Z" fill="#8fa2b3" opacity="0.9"/>
+        </defs>
+
+        <!-- heat halo behind the housing -->
+        <ellipse id="heatHalo" cx="230" cy="120" rx="170" ry="110" fill="url(#heatGlow)" opacity="0"/>
+
+        <!-- terminal box + supply cable -->
+        <rect x="185" y="18" width="60" height="34" rx="3" fill="#1b232d" stroke="#324152"/>
+        <text x="215" y="39" text-anchor="middle" class="svg-label">T-BOX</text>
+        <path d="M 215 52 L 215 70" stroke="#3a4a5c" stroke-width="6" fill="none" stroke-linecap="round"/>
+        <g id="currentDots" stroke="#ffb020" stroke-width="6" stroke-linecap="round" fill="none" opacity="0">
+          <path d="M 215 52 L 215 70" stroke-dasharray="2 10"/>
+        </g>
+
+        <!-- end bells -->
+        <rect x="58" y="60" width="26" height="120" rx="6" fill="#202932" stroke="#324152"/>
+        <rect x="386" y="60" width="26" height="120" rx="6" fill="#202932" stroke="#324152"/>
+
+        <!-- stator housing with cooling fins -->
+        <g id="statorBody">
+          <rect x="84" y="46" width="302" height="148" rx="16" fill="url(#bodyGrad)" stroke="#3a4a5c" stroke-width="2"/>
+          <g id="finGroup" stroke="#0d1218" stroke-width="3" opacity="0.55">
+            <line x1="104" y1="52" x2="104" y2="188"/><line x1="124" y1="52" x2="124" y2="188"/>
+            <line x1="144" y1="52" x2="144" y2="188"/><line x1="164" y1="52" x2="164" y2="188"/>
+            <line x1="184" y1="52" x2="184" y2="188"/><line x1="204" y1="52" x2="204" y2="188"/>
+            <line x1="224" y1="52" x2="224" y2="188"/><line x1="244" y1="52" x2="244" y2="188"/>
+            <line x1="264" y1="52" x2="264" y2="188"/><line x1="284" y1="52" x2="284" y2="188"/>
+            <line x1="304" y1="52" x2="304" y2="188"/><line x1="324" y1="52" x2="324" y2="188"/>
+            <line x1="344" y1="52" x2="344" y2="188"/><line x1="364" y1="52" x2="364" y2="188"/>
+          </g>
+          <rect x="84" y="46" width="302" height="148" rx="16" fill="none" stroke="#3a4a5c" stroke-width="2"/>
+          <text x="235" y="125" text-anchor="middle" class="svg-label-lg">7.5kW &middot; 4-POLE</text>
+        </g>
+
+        <!-- shaft -->
+        <rect x="412" y="106" width="56" height="28" fill="#4a5b6d" stroke="#2a3542"/>
+
+        <!-- fan guard (static) -->
+        <circle cx="520" cy="120" r="58" fill="none" stroke="#324152" stroke-width="3"/>
+        <circle cx="520" cy="120" r="58" fill="none" stroke="#1b232d" stroke-width="10" opacity="0.4"/>
+
+        <!-- rotating fan (blade template lives in <defs> above) -->
+        <g id="fanGroup">
+          <circle cx="520" cy="120" r="14" fill="#4a5b6d" stroke="#2a3542" stroke-width="2"/>
+          <use href="#fanBlade" transform="rotate(0 520 120)"/>
+          <use href="#fanBlade" transform="rotate(60 520 120)"/>
+          <use href="#fanBlade" transform="rotate(120 520 120)"/>
+          <use href="#fanBlade" transform="rotate(180 520 120)"/>
+          <use href="#fanBlade" transform="rotate(240 520 120)"/>
+          <use href="#fanBlade" transform="rotate(300 520 120)"/>
+        </g>
+
+        <!-- alarm ring, only visible when tripped -->
+        <rect id="alarmRing" x="80" y="42" width="330" height="156" rx="18" fill="none" stroke="#ff5457" stroke-width="3" opacity="0"/>
+
+        <text x="520" y="196" text-anchor="middle" class="svg-label">COOLING FAN</text>
+      </svg>
+      <div class="motor-visual-foot">
+        <span>shaft speed: <b id="visualRpmReadout">0</b> RPM</span>
+        <span>winding: <b id="visualTempReadout">25</b>&deg;C</span>
+        <span id="visualStateReadout" class="state-ok">NOMINAL</span>
+      </div>
+    </section>
+
+    <!-- Hero: digital twin residual strip chart -->
+    <section class="panel hero">
+      <div class="hero-head">
+        <div>
+          <div class="hero-eyebrow">DIGITAL TWIN &mdash; BEHAVIOURAL RESIDUAL</div>
+          <div class="hero-sub">shadow physics model vs. reported field state &nbsp;&middot;&nbsp; independent of the command channel</div>
+        </div>
+        <div class="twin-alarm" id="twinAlarm"><span class="dot"></span>NOMINAL</div>
+      </div>
+      <canvas id="residualScope" class="scope"></canvas>
+      <div class="hero-foot">
+        <span>expected: <b id="twinExpectedFreq">0.0 Hz</b> / <b id="twinExpectedRpm">0 RPM</b></span>
+        <span>reported: <b id="fieldFreq">0.0 Hz</b> / <b id="fieldRpm">0 RPM</b></span>
+        <span class="residual-readout">residual: <b id="residualRpm">0</b> RPM</span>
+      </div>
+    </section>
+
+    <!-- Operator console -->
+    <section class="panel console">
+      <div class="panel-head">
+        <span class="eyebrow">OPERATOR CONSOLE</span>
+        <span class="dim-sm">authenticated HMI</span>
+      </div>
+      <div class="console-body">
+        <label class="slider-label" for="freqSlider">Target frequency &mdash; <span id="freqSliderVal">0.0</span> Hz</label>
+        <input type="range" id="freqSlider" min="0" max="60" step="0.5" value="0">
+        <div class="preset-row">
+          <button class="btn btn-op" data-freq="0">STOP</button>
+          <button class="btn btn-op" data-freq="25">25 Hz</button>
+          <button class="btn btn-op" data-freq="50">50 Hz</button>
+          <button class="btn btn-op" data-freq="60">60 Hz</button>
+        </div>
+        <button class="btn btn-op-primary" id="sendCommandBtn">SEND SIGNED COMMAND</button>
+      </div>
+    </section>
+
+    <!-- Security layer toggles + attack console -->
+    <section class="panel console attack">
+      <div class="panel-head">
+        <span class="eyebrow">ATTACK CONSOLE</span>
+        <span class="dim-sm">adversary with network access to the VFD</span>
+      </div>
+
+      <div class="security-toggles">
+        <label class="switch-row">
+          <span>HMAC authentication</span>
+          <span class="switch"><input type="checkbox" id="toggleAuth" checked><span class="slider-pill"></span></span>
+        </label>
+        <label class="switch-row">
+          <span>Physics ramp-rate filter</span>
+          <span class="switch"><input type="checkbox" id="togglePhysics" checked><span class="slider-pill"></span></span>
+        </label>
+      </div>
+
+      <div class="attack-grid">
+        <button class="btn btn-atk" data-attack="unsigned">
+          <span class="atk-name">Unsigned Injection</span>
+          <span class="atk-desc">no credentials &mdash; caught by HMAC check</span>
+        </button>
+        <button class="btn btn-atk" data-attack="replay">
+          <span class="atk-name">Replay Capture</span>
+          <span class="atk-desc">resend last valid command &mdash; caught by nonce check</span>
+        </button>
+        <button class="btn btn-atk" data-attack="stolen_key_jump">
+          <span class="atk-name">Stolen-Key Jump</span>
+          <span class="atk-desc">valid signature, instant 60Hz &mdash; caught by ramp filter</span>
+        </button>
+        <button class="btn btn-atk btn-atk-severe" data-attack="firmware_bypass">
+          <span class="atk-name">Firmware Bypass</span>
+          <span class="atk-desc">writes VFD register directly &mdash; only the twin sees it</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- Event log -->
+    <section class="panel log">
+      <div class="panel-head">
+        <span class="eyebrow">SECURITY EVENT LOG</span>
+        <span class="dim-sm"><span id="acceptedCount">0</span> accepted &middot; <span id="rejectedCount">0</span> rejected</span>
+      </div>
+      <div class="log-body" id="logBody">
+        <div class="log-empty">Awaiting events&hellip;</div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
