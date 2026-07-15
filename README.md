@@ -128,3 +128,4 @@ streams telemetry at 20 Hz.
 - Persist event logs to a file/DB for a post-incident forensics view
 - Swap the fixed HMAC secret for a rotating key exchange to demonstrate
   key-compromise recovery
+  this is for git hub
